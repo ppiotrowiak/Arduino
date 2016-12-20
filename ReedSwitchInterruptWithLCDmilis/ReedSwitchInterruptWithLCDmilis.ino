@@ -1,7 +1,7 @@
 #include <Wire.h> //This library allows to communicate with I2C / TWI devices.
 #include <LiquidCrystal_I2C.h>
 volatile word steps;//load the variable from RAM and not from a storage register
-volatile unsigned long speedTimes[5]; //load the variable from RAM and not from a storage register
+volatile unsigned long speedTimes[2]; //load the variable from RAM and not from a storage register
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 int lastSteps = 0;
@@ -51,16 +51,13 @@ void onStep()
 {
   //static unsigned long lastTime;
   unsigned long timeNow = millis();
-  if (timeNow - lastTime < 200)
+  if (millis() - speedTimes[0] < 200)
     return;
     //Serial.print("Time now:");
     //Serial.println(timeNow);
-    speedTimes[speedIndex++] = timeNow - lastTime;
-    if (speedIndex >= sizeof(speedTimes)/sizeof(long))
-    {
-      speedIndex = 0;
-    }
-    steps++;
-    lastTime = timeNow;
+    speedTimes[1] = speedTimes[0];
+    speedTimes[0] = timeNow - lastTime;
+   
+    steps++;  
     
 }
