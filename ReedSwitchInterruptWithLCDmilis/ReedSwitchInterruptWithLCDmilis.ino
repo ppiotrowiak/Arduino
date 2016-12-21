@@ -11,6 +11,7 @@ const unsigned int circ = 2073; //dystans w mm jaki pokonuje kolo w 1 obrocie zw
 const unsigned long distFact = 1000;
 const unsigned long hour = 3600000;
 unsigned long speedFactor = 0;
+unsigned int speed = 0;
 void setup()
 {
 
@@ -24,8 +25,17 @@ void setup()
 
 void loop()
 { 
+  
   unsigned long wheelRotationInterval = speedTimes[0] - speedTimes[1];
-   
+  if ((millis() - speedTimes[0]) < 2000)
+  {
+    speed = speedFactor/wheelRotationInterval;
+  }
+  else 
+  {
+    speed = 0;
+  }
+  
   lcd.clear();  
  
   for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
@@ -35,13 +45,18 @@ void loop()
   }
   //Serial.println(sizeof(speedTimes)/sizeof(long));
   Serial.print("Speed interval: ");
-  Serial.println(wheelRotationInterval);
+  Serial.print(wheelRotationInterval);
+  Serial.print(" Speed: ");
+  Serial.println(speed);
   
   lcd.print("Obrotow :");
   lcd.print(steps);
   lcd.setCursor(0,1);
-  
-  lcd.print(speedFactor/wheelRotationInterval); 
+ 
+  lcd.print(speed / 1000); 
+  lcd.print(".");
+  lcd.print(speed % 1000);
+  lcd.print(" km/h");
   
   delay(1000);
 
