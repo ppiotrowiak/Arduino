@@ -1,48 +1,41 @@
+//Design for micro pro
 #include <Wire.h> //This library allows to communicate with I2C / TWI devices.
-#include <LiquidCrystal_I2C.h>
-volatile word steps;//load the variable from RAM and not from a storage register
-volatile unsigned long speedTimes[5]; //load the variable from RAM and not from a storage register
-// Set the LCD address to 0x27 for a 16 chars and 2 line display
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-int lastSteps = 0;
-unsigned long lastTime;
+#include <SPI.h> //is this really necessary?
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-int speedIndex = 0;
+volatile word steps;//load the variable from RAM and not from a storage register
+volatile unsigned long speedTimes[2]; //load the variable from RAM and not from a storage register
+
+
+unsigned long lastTime;
 const unsigned int circ = 2073; //dystans w mm jaki pokonuje kolo w 1 obrocie zwiazane ze srednica kola. UWAGA zrobic funkcje przeliczajaca z cali w momencie uruchomienia programu
 const unsigned long distFact = 1000;
 const unsigned long hour = 3600000;
 unsigned long speedFactor = 0;
+volatile unsigned int speed = 0;
 void setup()
 {
-
-  Serial.begin(9600);
-  lcd.init();
-  lcd.backlight();
-  pinMode(2, INPUT_PULLUP);
-  attachInterrupt(0, onStep, RISING);//dodaj przerwanie do pinu 2 
+  
+  pinMode(1, INPUT_PULLUP); //interrupt pin 
+  attachInterrupt(0, onStep, RISING);//dodaj przerwanie do pinu 1 (tx0) [ pin 1 is interrupt 3]
   speedFactor = circ*hour/distFact; //wstępne obliczenia
 }
 
 void loop()
-{  
-  lcd.clear();
+{ 
   
-  // debugging  
-  for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
+  unsigned long wheelRotationInterval = speedTimes[0] - speedTimes[1];
+  if ((millis() - speedTimes[0]) < 2000)
   {
-    Serial.print(speedTimes[i]);
-    Serial.print(" ");
+    speed = speedFactor/wheelRotationInterval;
   }
-  Serial.println(sizeof(speedTimes)/sizeof(long));
-  Serial.println(speedIndex);
-  //Serial.println(steps);
-  lcd.print("Obrotow :");
-  lcd.print(steps);
-  lcd.setCursor(0,1);
-  //lcd.print("last:");
-  //lcd.print(speedTimes[0]);
-  lcd.print(speedFactor/speedTimes[0]);
-  lastSteps = steps;  
+  else 
+  {
+    speed = 0;
+  } 
+
+  
   delay(1000);
 
 }
@@ -50,17 +43,12 @@ void loop()
 void onStep()
 {
   //static unsigned long lastTime;
-  unsigned long timeNow = millis();
-  if (timeNow - lastTime < 200)
+  unsigned long timeNow = millis(); //unsigned long 32 bits  range from 0 to 4,294,967,295 (2^32 - 1)
+  if (timeNow - speedTimes[0] < 200) //debouncing
     return;
-    //Serial.print("Time now:");
-    //Serial.println(timeNow);
-    speedTimes[speedIndex++] = timeNow - lastTime;
-    if (speedIndex >= sizeof(speedTimes)/sizeof(long))
-    {
-      speedIndex = 0;
-    }
-    steps++;
-    lastTime = timeNow;
+
+    speedTimes[1] = speedTimes[0];
+    speedTimes[0] = timeNow;   
     
+    steps++;      
 }
