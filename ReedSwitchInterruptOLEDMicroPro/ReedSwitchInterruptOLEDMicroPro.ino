@@ -37,7 +37,7 @@ void setup()
   // init done
   
   pinMode(1, INPUT_PULLUP); //interrupt pin 
-  attachInterrupt(0, onStep, RISING);//dodaj przerwanie do pinu 1 (tx0) [ pin 1 is interrupt 3]
+  attachInterrupt(3, onStep, RISING);//dodaj przerwanie do pinu 1 (tx0) [ pin 1 is interrupt 3]
   speedFactor = circ*hour/distFact; //wstępne obliczenia
 
   display.clearDisplay();
@@ -63,6 +63,14 @@ void loop()
   {
     speed = 0;
   } 
+
+  //show speed on the oled
+  display.clearDisplay();
+  display.setCursor(10, 10);
+  display.setTextColor(WHITE);
+  display.setTextSize(3);
+  display.print(speed);
+  display.display();
 
   for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
   {
