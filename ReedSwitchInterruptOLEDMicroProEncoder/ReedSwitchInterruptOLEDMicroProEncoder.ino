@@ -3,6 +3,8 @@
 #include <SPI.h> //is this really necessary?
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <ClickEncoder.h>
+#include <TimerOne.h>
 
 /*
  * #define is a useful C component that allows the programmer to give a name to a constant value before the program is compiled. Defined constants in arduino don't take up any program memory space on the chip. 
