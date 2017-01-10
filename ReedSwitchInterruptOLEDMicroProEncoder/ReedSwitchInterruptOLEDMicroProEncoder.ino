@@ -26,13 +26,13 @@ const unsigned int circ = 2073; //dystans w mm jaki pokonuje kolo w 1 obrocie zw
 const unsigned long distFact = 1000;
 const unsigned long hour = 3600000;
 unsigned long speedFactor = 0;
-volatile unsigned int speed = 0;
+volatile unsigned int speed = 0; //max value 65,535 (2^16) - 1)
 void setup()
 {
-  Serial.begin(9600);
-    while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+//  Serial.begin(9600);
+//    while (!Serial) {
+//    ; // wait for serial port to connect. Needed for native USB port only
+//  }
 
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
@@ -65,13 +65,28 @@ void loop()
   {
     speed = 0;
   } 
-
+speed = 12333;
   //show speed on the oled
   display.clearDisplay();
-  display.setCursor(10, 10);
   display.setTextColor(WHITE);
   display.setTextSize(3);
-  display.print(speed);
+  if ((speed/1000) > 9)
+  {
+    display.setCursor(0, 10);//for speed km 10-99
+  }
+  else 
+  {
+    display.setCursor(18, 10);//for speed km0-9
+  }
+  display.print(speed/1000);
+  //display.print("0");
+  display.setCursor(30, 10);
+  display.print(".");
+  display.setCursor(45,10);
+  display.print("00");
+  display.setCursor(80, 24);
+  display.setTextSize(1);
+  display.print("km/h");
   display.display();
 
   for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
