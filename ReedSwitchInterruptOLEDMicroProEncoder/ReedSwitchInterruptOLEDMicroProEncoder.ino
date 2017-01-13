@@ -19,6 +19,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 volatile word steps;//load the variable from RAM and not from a storage register
 volatile unsigned long speedTimes[2]; //load the variable from RAM and not from a storage register
+volatile unsigned long cadenceTimes[2];
 
 
 unsigned long lastTime;
@@ -38,8 +39,10 @@ void setup()
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
   // init done
   
-  pinMode(1, INPUT_PULLUP); //interrupt pin 
+  pinMode(1, INPUT_PULLUP); //interrupt pin for speed
+  pinMode(0, INPUT_PULLUP); //interrupt pin for cadence
   attachInterrupt(3, onStep, RISING);//dodaj przerwanie do pinu 1 (tx0) [ pin 1 is interrupt 3]
+  attachInterrupt(2, onCadence, RISING);//[ pin 0 is interrupt 2] (rx1)
   speedFactor = circ*hour/distFact; //wstępne obliczenia
 
   display.clearDisplay();
@@ -65,7 +68,7 @@ void loop()
   {
     speed = 0;
   } 
-speed = 12333;
+
   //show speed on the oled
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -126,3 +129,10 @@ void onStep()
     
     steps++;      
 }
+
+void onCadence()
+{
+  
+}
+
+
