@@ -83,7 +83,17 @@ speed = 12333;
   display.setCursor(30, 10);
   display.print(".");
   display.setCursor(45,10);
-  display.print("00");
+  int reminder = speed % 1000;
+  String rem = String(reminder, DEC);
+  if (rem.length() == 1)
+  {
+    rem = rem + "0";
+  }
+  else if (rem.length() > 2)
+  {
+    rem = rem.substring(0,2);
+  }
+  display.print(rem);
   display.setCursor(80, 24);
   display.setTextSize(1);
   display.print("km/h");
