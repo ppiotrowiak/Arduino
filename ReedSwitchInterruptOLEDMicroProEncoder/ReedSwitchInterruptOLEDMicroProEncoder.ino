@@ -20,20 +20,25 @@ Adafruit_SSD1306 display(OLED_RESET);
 volatile word steps;//load the variable from RAM and not from a storage register
 volatile unsigned long speedTimes[2]; //load the variable from RAM and not from a storage register
 volatile unsigned long cadenceTimes[2];
-
+unsigned long wheelRotationInterval;
 
 unsigned long lastTime;
+unsigned long lastTimeCadence;
 const unsigned int circ = 2073; //dystans w mm jaki pokonuje kolo w 1 obrocie zwiazane ze srednica kola. UWAGA zrobic funkcje przeliczajaca z cali w momencie uruchomienia programu
 const unsigned long distFact = 1000;
 const unsigned long hour = 3600000;
 unsigned long speedFactor = 0;
 volatile unsigned int speed = 0; //max value 65,535 (2^16) - 1)
+volatile unsigned int cadence = 0;
+
 void setup()
 {
 //  Serial.begin(9600);
 //    while (!Serial) {
 //    ; // wait for serial port to connect. Needed for native USB port only
 //  }
+
+//przydaloby sie tutaj zainicjowac tablice...
 
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
@@ -58,16 +63,27 @@ void setup()
 
 void loop()
 { 
-  
-  unsigned long wheelRotationInterval = speedTimes[0] - speedTimes[1];
+  //calculation of speed  
   if ((millis() - speedTimes[0]) < 2000)
   {
+    wheelRotationInterval = speedTimes[0] - speedTimes[1];
     speed = speedFactor/wheelRotationInterval;
   }
   else 
   {
     speed = 0;
   } 
+
+  //calculation of cadence
+  if (millis() - cadenceTimes[0] < 3500)
+  {
+    cadence = 60000 / (cadenceTimes[0] - cadenceTimes[1]);
+  }
+  else 
+  {
+    cadence = 0;
+  }
+  
 
   //show speed on the oled
   display.clearDisplay();
@@ -132,7 +148,12 @@ void onStep()
 
 void onCadence()
 {
-  
+  unsigned long timeNow = millis();
+  if (timeNow - cadenceTimes[0] < 200) //debouncing
+  return;
+
+  cadenceTimes[1] = cadenceTimes[0];
+  cadenceTimes[0] = timeNow;
 }
 
 
