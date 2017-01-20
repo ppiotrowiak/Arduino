@@ -116,8 +116,17 @@ void loop()
   display.setCursor(80, 24);
   display.setTextSize(1);
   display.print("km/h");
-  display.display();
+  
 
+  //display cadence
+  display.setTextSize(3);
+  display.setCursor(45,40);
+  display.print(cadence);
+  display.setTextSize(1);
+  display.setCursor(80,54);  
+  display.print("rpm");
+  display.display();
+  
   for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
   {
     Serial.print(speedTimes[i]);
@@ -128,6 +137,14 @@ void loop()
   Serial.print(wheelRotationInterval);
   Serial.print(" Speed: ");
   Serial.println(speed);
+  Serial.print("Cadence: ");
+  Serial.println(cadence);
+  Serial.print("Cadence times: ");
+  for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
+  {
+    Serial.print(cadenceTimes[i]);
+    Serial.print(" ");
+  }
   
   delay(1000);
 
