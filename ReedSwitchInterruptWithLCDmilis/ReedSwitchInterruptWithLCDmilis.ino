@@ -36,7 +36,11 @@ void loop()
     speed = 0;
   }
   
-  lcd.clear();  
+  display.clearDisplay();  
+  display.setCursor(10, 10);
+  display.setTextColor(WHITE);
+  display.setTextSize(3);
+  display.print(speed);
  
   for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
   {

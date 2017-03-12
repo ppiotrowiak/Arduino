@@ -24,6 +24,8 @@ unsigned long wheelRotationInterval;
 
 unsigned long lastTime;
 unsigned long lastTimeCadence;
+unsigned long screenRefreshInterval = 1000;
+unsigned long screenRefreshLast = 0;
 const unsigned int circ = 2073; //dystans w mm jaki pokonuje kolo w 1 obrocie zwiazane ze srednica kola. UWAGA zrobic funkcje przeliczajaca z cali w momencie uruchomienia programu
 const unsigned long distFact = 1000;
 const unsigned long hour = 3600000;
@@ -44,9 +46,11 @@ void setup()
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
   // init done
   
-  pinMode(1, INPUT_PULLUP); //interrupt pin for speed
+  //pinMode(1, INPUT_PULLUP); //interrupt pin for speed
+  pinMode(7, INPUT_PULLUP); //interrupt pin for interrupts (now only for speed)
   pinMode(0, INPUT_PULLUP); //interrupt pin for cadence
-  attachInterrupt(3, onStep, RISING);//dodaj przerwanie do pinu 1 (tx0) [ pin 1 is interrupt 3]
+  //attachInterrupt(3, onStep, RISING);//dodaj przerwanie do pinu 1 (tx0) [ pin 1 is interrupt 3]
+  attachInterrupt(4, onStep, RISING);//obsluga przerwania 4 (przerwanie jest na pinie 7)
   attachInterrupt(2, onCadence, RISING);//[ pin 0 is interrupt 2] (rx1)
   speedFactor = circ*hour/distFact; //wstępne obliczenia
 
@@ -63,6 +67,7 @@ void setup()
 
 void loop()
 { 
+  unsigned long currentMillis = millis();
   //calculation of speed  
   if ((millis() - speedTimes[0]) < 2000)
   {
@@ -84,8 +89,64 @@ void loop()
     cadence = 0;
   }
   
+  if((unsigned long)(currentMillis - screenRefreshLast) >= screenRefreshInterval)
+  {
+    screenRefreshLast = currentMillis;
+    screenRefresh();
+  }
+  
 
-  //show speed on the oled
+  /*
+  for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
+  {
+    Serial.print(speedTimes[i]);
+    Serial.print(" ");
+  }
+  //Serial.println(sizeof(speedTimes)/sizeof(long));
+  
+  Serial.print("Speed interval: ");
+  Serial.print(wheelRotationInterval);
+  Serial.print(" Speed: ");
+  Serial.println(speed);
+  Serial.print("Cadence: ");
+  Serial.println(cadence);
+  Serial.print("Cadence times: ");
+  for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
+  {
+    Serial.print(cadenceTimes[i]);
+    Serial.print(" ");
+  }
+  */
+  
+ 
+}
+
+void onStep()
+{
+  //static unsigned long lastTime;
+  unsigned long timeNow = millis(); //unsigned long 32 bits  range from 0 to 4,294,967,295 (2^32 - 1)
+  if (timeNow - speedTimes[0] < 200) //debouncing
+    return;
+
+    speedTimes[1] = speedTimes[0];
+    speedTimes[0] = timeNow;   
+    
+    steps++;      
+}
+
+void onCadence()
+{
+  unsigned long timeNow = millis();
+  if (timeNow - cadenceTimes[0] < 200) //debouncing
+  return;
+
+  cadenceTimes[1] = cadenceTimes[0];
+  cadenceTimes[0] = timeNow;
+}
+
+void screenRefresh()
+{
+  //show speed on the oled  
   display.clearDisplay();
   display.setTextColor(WHITE);
   display.setTextSize(3);
@@ -126,51 +187,6 @@ void loop()
   display.setCursor(80,54);  
   display.print("rpm");
   display.display();
-  
-  for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
-  {
-    Serial.print(speedTimes[i]);
-    Serial.print(" ");
-  }
-  //Serial.println(sizeof(speedTimes)/sizeof(long));
-  Serial.print("Speed interval: ");
-  Serial.print(wheelRotationInterval);
-  Serial.print(" Speed: ");
-  Serial.println(speed);
-  Serial.print("Cadence: ");
-  Serial.println(cadence);
-  Serial.print("Cadence times: ");
-  for(int i = 0; i < sizeof(speedTimes)/sizeof(long); i++)
-  {
-    Serial.print(cadenceTimes[i]);
-    Serial.print(" ");
-  }
-  
-  delay(1000);
-
-}
-
-void onStep()
-{
-  //static unsigned long lastTime;
-  unsigned long timeNow = millis(); //unsigned long 32 bits  range from 0 to 4,294,967,295 (2^32 - 1)
-  if (timeNow - speedTimes[0] < 200) //debouncing
-    return;
-
-    speedTimes[1] = speedTimes[0];
-    speedTimes[0] = timeNow;   
-    
-    steps++;      
-}
-
-void onCadence()
-{
-  unsigned long timeNow = millis();
-  if (timeNow - cadenceTimes[0] < 200) //debouncing
-  return;
-
-  cadenceTimes[1] = cadenceTimes[0];
-  cadenceTimes[0] = timeNow;
 }
 
 
