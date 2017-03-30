@@ -1,8 +1,10 @@
 //Design for micro pro
 #include <Wire.h> //This library allows to communicate with I2C / TWI devices.
 #include <SPI.h> //is this really necessary?
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+
+#include <Adafruit_GFX.h> //screen
+#include <Adafruit_SSD1306.h> //screen
+
 
 /*
  * #define is a useful C component that allows the programmer to give a name to a constant value before the program is compiled. Defined constants in arduino don't take up any program memory space on the chip. 
@@ -19,17 +21,16 @@ volatile word steps;//load the variable from RAM and not from a storage register
 volatile unsigned long speedTimes[2]; //load the variable from RAM and not from a storage register
 volatile unsigned long cadenceTimes[2];
 unsigned long wheelRotationInterval;
-
 unsigned long lastTime;
 unsigned long lastTimeCadence;
-unsigned long screenRefreshInterval = 1000;
-unsigned long screenRefreshLast = 0;
+
 const unsigned int circ = 2073; //dystans w mm jaki pokonuje kolo w 1 obrocie zwiazane ze srednica kola. UWAGA zrobic funkcje przeliczajaca z cali w momencie uruchomienia programu
 const unsigned long distFact = 1000;
 const unsigned long hour = 3600000;
 unsigned long speedFactor = 0;
 volatile unsigned int speed = 0; //max value 65,535 (2^16) - 1)
 volatile unsigned int cadence = 0;
+
 
 
 class Encoder
@@ -127,6 +128,10 @@ class Encoder
 };
 
 
+unsigned long screenRefreshInterval = 1000; //screen
+unsigned long screenRefreshLast = 0;
+
+
 void setup()
 {
 //  Serial.begin(9600);
@@ -136,6 +141,7 @@ void setup()
 
 //przydaloby sie tutaj zainicjowac tablice...
 
+  //display
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
   // init done
@@ -221,7 +227,7 @@ void onStep()
   unsigned long timeNow = millis(); //unsigned long 32 bits  range from 0 to 4,294,967,295 (2^32 - 1)
   if (timeNow - speedTimes[0] < 200) //debouncing
     return;
-
+    
     speedTimes[1] = speedTimes[0];
     speedTimes[0] = timeNow;   
     
@@ -270,8 +276,7 @@ void screenRefresh()
   display.print(rem);
   display.setCursor(80, 24);
   display.setTextSize(1);
-  display.print("km/h");
-  
+  display.print("km/h");  
 
   //display cadence
   display.setTextSize(3);
