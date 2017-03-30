@@ -1,7 +1,5 @@
 /*
   DigitalReadSerial
- Reads a digital input on pin 2, prints the result to the serial monitor
-
  This example code is in the public domain.
  */
 
@@ -49,6 +47,10 @@ class Encoder
 		posChanged = false;
 	}
 
+	bool AskPosChange()
+	{
+		return posChanged;
+	}
 	int GetPosition()
 	{
 		return currentPosition;
@@ -84,13 +86,13 @@ class Encoder
 		if (prev == 3 && current == 1)
 		{
 			currentPosition++;
-			Serial.println(currentPosition);
+			posChanged = true;			
 		}
 		//else if ((prev==2 && current==0) || (prev==1 && current==3))
 		else if (prev == 3 && current == 2)
 		{
 			currentPosition--;
-			Serial.println(currentPosition);
+			posChanged = true;			
 		}
 	}
 };
@@ -111,7 +113,12 @@ void setup() {
 
 // the loop routine runs over and over again forever:
 void loop() {
-  
+  	
+	if (en1.AskPosChange())
+	{
+		Serial.println(en1.GetPosition());
+		en1.AckPosChange();		
+	};
 	en1.HasPositionChanged();
       
   delay(1);        // delay in between reads for stability
