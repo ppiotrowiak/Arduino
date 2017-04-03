@@ -5,9 +5,9 @@
 
 class MyDisplay
 {  
-  //#define OLED_RESET 4
+  #define OLED_RESET 4
   
-  Adafruit_SSD1306 display(4);
+  
   public: MyDisplay()
   {
     Adafruit_SSD1306 display(OLED_RESET);
@@ -16,15 +16,15 @@ class MyDisplay
     #error("Height incorrect, please fix Adafruit_SSD1306.h!");
     #endif
 
-    //display
-    // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
-    // init done
+
   }
 
   void showSplash()
   {  
-
+    //display
+    // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
+      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
+    // init done
   }
 };
 
