@@ -3,15 +3,35 @@
 #include <Adafruit_GFX.h> //screen
 #include <Adafruit_SSD1306.h> //screen
 
-class MyDisplay
-{  
-  #define OLED_RESET 4
+class OLEDControllerClass
+{
+  public:
+  void init(Adafruit_SSD1306* Oled1);
 
-  private:   Adafruit_SSD1306 *display;
+  private: 
+  Adafruit_SSD1306* _Oled1;
+};
+
+void OLEDControllerClass::init(Adafruit_SSD1306* Oled1)
+{
+    _Oled1 = Oled1;
+    _Oled1->begin(SSD1306_SWITCHCAPVCC, 0x3C); 
+    _Oled1->clearDisplay();
+    _Oled1->setCursor(10, 10);
+    _Oled1->setTextColor(WHITE);
+    _Oled1->setTextSize(3);
+    _Oled1->print("Cycluino");
+    _Oled1->display();
+}
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
+#if (SSD1306_LCDHEIGHT != 64)
+#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
   
-  public: MyDisplay()
-  { 
-    display = new Adafruit_SSD1306(OLED_RESET);
+
+
 
 /*
     #if (SSD1306_LCDHEIGHT != 64)
@@ -22,17 +42,9 @@ class MyDisplay
     //display
     // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
       //display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
-      /*
-      display->clearDisplay();
-      display->setCursor(10, 10);
-      display->setTextColor(WHITE);
-      display->setTextSize(3);
-      display->print("Cycluino");
-      display->display();
-      */
-    // init done
 
-  }
+
+
 /*
   public: void showSplash()
   {  
@@ -48,12 +60,12 @@ class MyDisplay
 
   }
   */
-};
 
-MyDisplay screen;
+
+
 void setup() {
   // put your setup code here, to run once:
-  //screen.showSplash();
+  //display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
 }
 
 void loop() {
