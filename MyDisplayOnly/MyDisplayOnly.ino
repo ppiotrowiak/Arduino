@@ -13,19 +13,28 @@ class MyDisplay
   { 
     display = new Adafruit_SSD1306(OLED_RESET);
 
+/*
     #if (SSD1306_LCDHEIGHT != 64)
     #error("Height incorrect, please fix Adafruit_SSD1306.h!");
     #endif
 
-
+*/
     //display
     // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-      display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
+      //display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
+      /*
+      display->clearDisplay();
+      display->setCursor(10, 10);
+      display->setTextColor(WHITE);
+      display->setTextSize(3);
+      display->print("Cycluino");
+      display->display();
+      */
     // init done
 
   }
-
-  void showSplash()
+/*
+  public: void showSplash()
   {  
     display->clearDisplay();
     display->setCursor(10, 10);
@@ -38,12 +47,13 @@ class MyDisplay
     display->display();
 
   }
+  */
 };
 
-MyDisplay screen();
+MyDisplay screen;
 void setup() {
   // put your setup code here, to run once:
-  
+  //screen.showSplash();
 }
 
 void loop() {
