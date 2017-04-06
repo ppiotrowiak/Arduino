@@ -11,10 +11,12 @@ class OLEDControllerClass
   private: 
   Adafruit_SSD1306* _Oled1;
 };
+extern OLEDControllerClass OLEDController;
 
 void OLEDControllerClass::init(Adafruit_SSD1306* Oled1)
 {
     _Oled1 = Oled1;
+     // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
     _Oled1->begin(SSD1306_SWITCHCAPVCC, 0x3C); 
     _Oled1->clearDisplay();
     _Oled1->setCursor(10, 10);
@@ -30,8 +32,6 @@ Adafruit_SSD1306 display(OLED_RESET);
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
   
-
-
 
 /*
     #if (SSD1306_LCDHEIGHT != 64)
@@ -61,11 +61,12 @@ Adafruit_SSD1306 display(OLED_RESET);
   }
   */
 
-
+OLEDControllerClass controller;
 
 void setup() {
   // put your setup code here, to run once:
   //display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
+  controller.init(&display);
 }
 
 void loop() {
