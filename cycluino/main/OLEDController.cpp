@@ -20,7 +20,6 @@ void OLEDController::init(Adafruit_SSD1306* Oled1)
 
 void OLEDController::showSpeedAndCadence(unsigned int speed, unsigned int cadence)
 {
-
   //show speed on the oled  
   _Oled1->clearDisplay();
   _Oled1->setTextColor(WHITE);
@@ -61,3 +60,15 @@ void OLEDController::showSpeedAndCadence(unsigned int speed, unsigned int cadenc
   _Oled1->print("rpm");
   _Oled1->display();
 }
+
+void OLEDController::showTempAndHumidity()
+{
+  _Oled1->clearDisplay();
+  _Oled1->setTextColor(WHITE);
+  _Oled1->setTextSize(3);
+  _Oled1->setCursor(20,20);
+  _Oled1->print("Temp&Humid");
+  _Oled1->display();
+}
+
+

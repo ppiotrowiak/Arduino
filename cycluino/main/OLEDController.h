@@ -12,12 +12,11 @@ class OLEDController
   public:
   void init(Adafruit_SSD1306* Oled1);
   void showSpeedAndCadence(unsigned int speed, unsigned int cadence);
+  void showTempAndHumidity();
  
   private: 
   Adafruit_SSD1306* _Oled1;
 };
-
-
 
 #endif
 
